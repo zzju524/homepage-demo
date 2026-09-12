@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>张小明 · 个人主页</title>
+<meta name="description" content="张小明的个人主页 —— 前端开发 / 学习者">
+<style>
+  :root {
+    --bg: #0f1115;
+    --bg-soft: #171a21;
+    --card: #1c2028;
+    --line: #2a2f3a;
+    --text: #e8eaf0;
+    --muted: #9aa3b2;
+    --accent: #6ea8fe;
+    --accent-2: #8b7cf6;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f7f8fa;
+      --bg-soft: #ffffff;
+      --card: #ffffff;
+      --line: #e4e7ec;
+      --text: #1a1d23;
+      --muted: #5f6673;
+      --accent: #2f6feb;
+      --accent-2: #6b52e0;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- 顶部导航 ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brand { font-weight: 700; letter-spacing: .02em; }
+  .brand span {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  nav ul { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color .18s ease;
+  }
+  nav a:hover { color: var(--text); }
+  @media (max-width: 520px) { nav ul { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 72px 0 56px; }
+  .avatar {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 30px; font-weight: 700; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    margin: 0 0 10px;
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.25;
+    letter-spacing: -.01em;
+  }
+  .hero .role { color: var(--muted); font-size: 17px; margin: 0 0 24px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .tag {
+    font-size: 13px;
+    padding: 4px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--bg-soft);
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform .15s ease, opacity .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); opacity: .9; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+  .btn-ghost { border: 1px solid var(--line); color: var(--text); background: var(--bg-soft); }
+
+  /* ---------- 区块 ---------- */
+  section { padding: 40px 0; border-top: 1px solid var(--line); }
+  section h2 {
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+    margin: 0 0 20px;
+    font-weight: 600;
+  }
+  section p { margin: 0 0 14px; }
+  section p:last-child { margin-bottom: 0; }
+
+  .cards { display: grid; gap: 14px; }
+  @media (min-width: 620px) { .cards { grid-template-columns: 1fr 1fr; } }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color .18s ease, transform .18s ease;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card h3 { margin: 0 0 6px; font-size: 16px; }
+  .card p { color: var(--muted); font-size: 14px; margin: 0; }
+
+  .skills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill {
+    font-size: 13px;
+    padding: 6px 13px;
+    border-radius: 8px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+
+  .contact { display: grid; gap: 10px; }
+  .contact a {
+    color: var(--text);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--card);
+    font-size: 15px;
+    transition: border-color .18s ease;
+  }
+  .contact a:hover { border-color: var(--accent); }
+  .contact .k { color: var(--muted); font-size: 13px; min-width: 62px; }
+
+  footer {
+    padding: 32px 0 48px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="brand"><span>张小明</span></div>
+    <ul>
+      <li><a href="#about">关于</a></li>
+      <li><a href="#projects">项目</a></li>
+      <li><a href="#skills">技能</a></li>
+      <li><a href="#contact">联系</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ Hero ============ -->
+  <div class="hero">
+    <div class="avatar">张</div>
+    <h1>你好，我是张小明 👋</h1>
+    <p class="role">前端开发学习者 · 目前在学 HTML / CSS / JavaScript</p>
+    <div class="tags">
+      <span class="tag">📍 中国</span>
+      <span class="tag">🎯 目标：做出好看又好用的网页</span>
+      <span class="tag">🌱 持续学习中</span>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="#contact">联系我</a>
+      <a class="btn btn-ghost" href="#projects">看看我的项目</a>
+    </div>
+  </div>
+
+  <!-- ============ 关于 ============ -->
+  <section id="about">
+    <h2>关于我</h2>
+    <p>我是一名正在学习 Web 开发的学生，对把想法变成能在浏览器里打开的东西这件事非常着迷。平时喜欢折腾各种小工具，也喜欢把学到的东西写成笔记。</p>
+    <p>这个页面就是我的第一个部署到公网的作品 —— 它很朴素，但每一行都是我自己敲的。</p>
+  </section>
+
+  <!-- ============ 项目 ============ -->
+  <section id="projects">
+    <h2>项目</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>个人主页</h3>
+        <p>你正在看的这个页面。纯 HTML + CSS，单文件，无依赖。</p>
+      </div>
+      <div class="card">
+        <h3>待办清单</h3>
+        <p>练手项目：用原生 JavaScript 实现增删改查与本地存储。</p>
+      </div>
+      <div class="card">
+        <h3>天气小应用</h3>
+        <p>调用了公开天气 API，练习异步请求与数据渲染。</p>
+      </div>
+      <div class="card">
+        <h3>学习笔记</h3>
+        <p>把踩过的坑记下来，方便以后的自己回头看。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 技能 ============ -->
+  <section id="skills">
+    <h2>技能</h2>
+    <div class="skills">
+      <span class="skill">HTML</span>
+      <span class="skill">CSS</span>
+      <span class="skill">JavaScript</span>
+      <span class="skill">Git</span>
+      <span class="skill">响应式布局</span>
+      <span class="skill">Markdown</span>
+    </div>
+  </section>
+
+  <!-- ============ 联系 ============ -->
+  <section id="contact">
+    <h2>联系我</h2>
+    <div class="contact">
+      <a href="mailto:you@example.com"><span class="k">邮箱</span> you@example.com</a>
+      <a href="https://github.com/" target="_blank" rel="noopener"><span class="k">GitHub</span> @your-username</a>
+      <a href="#" target="_blank" rel="noopener"><span class="k">博客</span> 我的学习笔记</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  © <span id="year"></span> 张小明 · 用 HTML 和 CSS 手写
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
