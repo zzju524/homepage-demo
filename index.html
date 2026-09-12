@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>张小明 · 个人主页</title>
-<meta name="description" content="张小明的个人主页 —— 前端开发 / 学习者">
+<title>赵子健 · 个人主页</title>
+<meta name="description" content="赵子健（剑阁）的个人主页 —— 复旦大学金融专硕在读，关注金融、健身与学习。">
 <style>
   :root {
     --bg: #0f1115;
@@ -97,6 +97,7 @@
     line-height: 1.25;
     letter-spacing: -.01em;
   }
+  .hero .alias { color: var(--muted); font-weight: 400; font-size: .6em; margin-left: 6px; }
   .hero .role { color: var(--muted); font-size: 17px; margin: 0 0 24px; }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
   .tag {
@@ -134,8 +135,29 @@
   section p { margin: 0 0 14px; }
   section p:last-child { margin-bottom: 0; }
 
+  /* ---------- 教育经历 ---------- */
+  .timeline { display: grid; gap: 0; }
+  .entry {
+    position: relative;
+    padding: 0 0 26px 26px;
+    border-left: 2px solid var(--line);
+  }
+  .entry:last-child { padding-bottom: 0; border-left-color: transparent; }
+  .entry::before {
+    content: "";
+    position: absolute;
+    left: -7px; top: 8px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .entry h3 { margin: 0 0 2px; font-size: 16px; }
+  .entry .meta { color: var(--muted); font-size: 14px; margin: 0; }
+
+  /* ---------- 关注方向 ---------- */
   .cards { display: grid; gap: 14px; }
-  @media (min-width: 620px) { .cards { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 620px) { .cards { grid-template-columns: repeat(3, 1fr); } }
   .card {
     background: var(--card);
     border: 1px solid var(--line);
@@ -144,19 +166,11 @@
     transition: border-color .18s ease, transform .18s ease;
   }
   .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card .icon { font-size: 22px; line-height: 1; margin-bottom: 10px; }
   .card h3 { margin: 0 0 6px; font-size: 16px; }
   .card p { color: var(--muted); font-size: 14px; margin: 0; }
 
-  .skills { display: flex; flex-wrap: wrap; gap: 8px; }
-  .skill {
-    font-size: 13px;
-    padding: 6px 13px;
-    border-radius: 8px;
-    background: var(--bg-soft);
-    border: 1px solid var(--line);
-    color: var(--text);
-  }
-
+  /* ---------- 联系 ---------- */
   .contact { display: grid; gap: 10px; }
   .contact a {
     color: var(--text);
@@ -185,11 +199,11 @@
 
 <header>
   <nav>
-    <div class="brand"><span>张小明</span></div>
+    <div class="brand"><span>赵子健</span></div>
     <ul>
       <li><a href="#about">关于</a></li>
-      <li><a href="#projects">项目</a></li>
-      <li><a href="#skills">技能</a></li>
+      <li><a href="#education">教育</a></li>
+      <li><a href="#focus">关注</a></li>
       <li><a href="#contact">联系</a></li>
     </ul>
   </nav>
@@ -199,60 +213,62 @@
 
   <!-- ============ Hero ============ -->
   <div class="hero">
-    <div class="avatar">张</div>
-    <h1>你好，我是张小明 👋</h1>
-    <p class="role">前端开发学习者 · 目前在学 HTML / CSS / JavaScript</p>
+    <div class="avatar">赵</div>
+    <h1>赵子健<span class="alias">剑阁</span></h1>
+    <p class="role">复旦大学经济学院 · 金融专硕在读</p>
     <div class="tags">
-      <span class="tag">📍 中国</span>
-      <span class="tag">🎯 目标：做出好看又好用的网页</span>
-      <span class="tag">🌱 持续学习中</span>
+      <span class="tag">🎓 复旦 金融专硕</span>
+      <span class="tag">⚙️ 浙大 机械工程 本科</span>
+      <span class="tag">📍 上海</span>
     </div>
     <div class="actions">
       <a class="btn btn-primary" href="#contact">联系我</a>
-      <a class="btn btn-ghost" href="#projects">看看我的项目</a>
+      <a class="btn btn-ghost" href="https://github.com/zzju524" target="_blank" rel="noopener">GitHub</a>
     </div>
   </div>
 
   <!-- ============ 关于 ============ -->
   <section id="about">
     <h2>关于我</h2>
-    <p>我是一名正在学习 Web 开发的学生，对把想法变成能在浏览器里打开的东西这件事非常着迷。平时喜欢折腾各种小工具，也喜欢把学到的东西写成笔记。</p>
-    <p>这个页面就是我的第一个部署到公网的作品 —— 它很朴素，但每一行都是我自己敲的。</p>
+    <p>我是赵子健，网名剑阁。目前就读于复旦大学经济学院，金融专业硕士在读；本科毕业于浙江大学机械工程专业。</p>
+    <p>从机械到金融，是一次跨度不小的转向。工科训练让我习惯把事情拆开、量化、找因果；金融则让我开始理解人、市场与不确定性。这两套思维方式正在我身上慢慢长到一起。</p>
+    <p>眼下最花时间的三件事：<strong>金融</strong>、<strong>健身</strong>、<strong>学习</strong>。</p>
   </section>
 
-  <!-- ============ 项目 ============ -->
-  <section id="projects">
-    <h2>项目</h2>
-    <div class="cards">
-      <div class="card">
-        <h3>个人主页</h3>
-        <p>你正在看的这个页面。纯 HTML + CSS，单文件，无依赖。</p>
+  <!-- ============ 教育 ============ -->
+  <section id="education">
+    <h2>教育经历</h2>
+    <div class="timeline">
+      <div class="entry">
+        <h3>复旦大学 · 经济学院</h3>
+        <p class="meta">金融专业硕士 · 在读</p>
       </div>
-      <div class="card">
-        <h3>待办清单</h3>
-        <p>练手项目：用原生 JavaScript 实现增删改查与本地存储。</p>
-      </div>
-      <div class="card">
-        <h3>天气小应用</h3>
-        <p>调用了公开天气 API，练习异步请求与数据渲染。</p>
-      </div>
-      <div class="card">
-        <h3>学习笔记</h3>
-        <p>把踩过的坑记下来，方便以后的自己回头看。</p>
+      <div class="entry">
+        <h3>浙江大学</h3>
+        <p class="meta">机械工程 · 本科</p>
       </div>
     </div>
   </section>
 
-  <!-- ============ 技能 ============ -->
-  <section id="skills">
-    <h2>技能</h2>
-    <div class="skills">
-      <span class="skill">HTML</span>
-      <span class="skill">CSS</span>
-      <span class="skill">JavaScript</span>
-      <span class="skill">Git</span>
-      <span class="skill">响应式布局</span>
-      <span class="skill">Markdown</span>
+  <!-- ============ 关注 ============ -->
+  <section id="focus">
+    <h2>我在做什么</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="icon">📈</div>
+        <h3>金融</h3>
+        <p>在学专业课，也在补数学与编程的底子。对市场怎么定价、风险怎么衡量这件事保持好奇。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🏋️</div>
+        <h3>健身</h3>
+        <p>日常的一部分。训练教会我一件和读书很像的事：长期坚持比短期爆发有用得多。</p>
+      </div>
+      <div class="card">
+        <div class="icon">📚</div>
+        <h3>学习</h3>
+        <p>持续输入。读文献、读财报，也读点专业之外的书 —— 这个页面就是最近新学的一小块。</p>
+      </div>
     </div>
   </section>
 
@@ -260,16 +276,15 @@
   <section id="contact">
     <h2>联系我</h2>
     <div class="contact">
-      <a href="mailto:you@example.com"><span class="k">邮箱</span> you@example.com</a>
-      <a href="https://github.com/" target="_blank" rel="noopener"><span class="k">GitHub</span> @your-username</a>
-      <a href="#" target="_blank" rel="noopener"><span class="k">博客</span> 我的学习笔记</a>
+      <a href="mailto:1529980630@qq.com"><span class="k">邮箱</span> 1529980630@qq.com</a>
+      <a href="https://github.com/zzju524" target="_blank" rel="noopener"><span class="k">GitHub</span> @zzju524</a>
     </div>
   </section>
 
 </main>
 
 <footer class="wrap">
-  © <span id="year"></span> 张小明 · 用 HTML 和 CSS 手写
+  © <span id="year"></span> 赵子健 · 用 HTML 和 CSS 手写
 </footer>
 
 <script>
