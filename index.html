@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>赵子健 · 个人主页</title>
-<meta name="description" content="赵子健（剑阁）的个人主页 —— 复旦大学金融专硕在读，关注金融、健身与学习。">
+<title>Jason Zhao · Homepage</title>
+<meta name="description" content="Personal homepage of Jason Zhao (赵子健) — M.Sc. in Finance at Fudan University. Focused on finance, fitness, and learning.">
 <style>
   :root {
     --bg: #0f1115;
@@ -71,6 +71,7 @@
     background-clip: text;
     color: transparent;
   }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
   nav ul { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; }
   nav a {
     color: var(--muted);
@@ -80,6 +81,34 @@
   }
   nav a:hover { color: var(--text); }
   @media (max-width: 520px) { nav ul { display: none; } }
+
+  /* ---------- 语言切换 ---------- */
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    font: inherit;
+    font-size: 13px;
+    line-height: 1;
+    padding: 5px 7px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg-soft);
+    cursor: pointer;
+    transition: border-color .18s ease;
+  }
+  .lang:hover { border-color: var(--accent); }
+  .lang span {
+    padding: 3px 7px;
+    border-radius: 999px;
+    color: var(--muted);
+    transition: color .18s ease, background .18s ease;
+  }
+  .lang span.active {
+    color: var(--text);
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+  }
+  .lang .sep { padding: 0; color: var(--line); }
 
   /* ---------- Hero ---------- */
   .hero { padding: 72px 0 56px; }
@@ -97,7 +126,8 @@
     line-height: 1.25;
     letter-spacing: -.01em;
   }
-  .hero .alias { color: var(--muted); font-weight: 400; font-size: .6em; margin-left: 6px; }
+  .hero .alias { color: var(--muted); font-weight: 400; font-size: .6em; margin-left: 10px; }
+  .hero .alias::before { content: "·"; margin-right: 6px; }
   .hero .role { color: var(--muted); font-size: 17px; margin: 0 0 24px; }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
   .tag {
@@ -172,7 +202,8 @@
 
   /* ---------- 联系 ---------- */
   .contact { display: grid; gap: 10px; }
-  .contact a {
+  .contact a,
+  .contact .row {
     color: var(--text);
     text-decoration: none;
     display: flex; align-items: center; gap: 10px;
@@ -199,13 +230,18 @@
 
 <header>
   <nav>
-    <div class="brand"><span>赵子健</span></div>
-    <ul>
-      <li><a href="#about">关于</a></li>
-      <li><a href="#education">教育</a></li>
-      <li><a href="#focus">关注</a></li>
-      <li><a href="#contact">联系</a></li>
-    </ul>
+    <div class="brand"><span data-zh="赵子健" data-en="Jason Zhao">赵子健</span></div>
+    <div class="nav-right">
+      <ul>
+        <li><a href="#about" data-zh="关于" data-en="About">关于</a></li>
+        <li><a href="#education" data-zh="教育" data-en="Education">教育</a></li>
+        <li><a href="#focus" data-zh="关注" data-en="Focus">关注</a></li>
+        <li><a href="#contact" data-zh="联系" data-en="Contact">联系</a></li>
+      </ul>
+      <button class="lang" id="langBtn" type="button" aria-label="切换语言 / Switch language">
+        <span data-lang-opt="zh">中</span><span class="sep">/</span><span data-lang-opt="en">EN</span>
+      </button>
+    </div>
   </nav>
 </header>
 
@@ -213,82 +249,135 @@
 
   <!-- ============ Hero ============ -->
   <div class="hero">
-    <img class="avatar" src="avatar.jpg" alt="赵子健" width="84" height="84">
-    <h1>赵子健<span class="alias">剑阁</span></h1>
-    <p class="role">复旦大学经济学院 · 金融专硕在读</p>
+    <img class="avatar" src="avatar.jpg" alt="赵子健 Jason Zhao" width="84" height="84">
+    <h1><span data-zh="赵子健" data-en="Jason Zhao">赵子健</span><span class="alias" data-zh="剑阁" data-en="Zzju">剑阁</span></h1>
+    <p class="role"
+       data-zh="复旦大学经济学院 · 金融专硕在读"
+       data-en="M.Sc. in Finance · School of Economics, Fudan University">复旦大学经济学院 · 金融专硕在读</p>
     <div class="tags">
-      <span class="tag">🎓 复旦 金融专硕</span>
-      <span class="tag">⚙️ 浙大 机械工程 本科</span>
-      <span class="tag">📍 上海</span>
+      <span class="tag" data-zh="🎓 复旦 金融专硕" data-en="🎓 M.Sc. Finance, Fudan">🎓 复旦 金融专硕</span>
+      <span class="tag" data-zh="⚙️ 浙大 机械工程 本科" data-en="⚙️ B.Eng. Mechanical Eng., ZJU">⚙️ 浙大 机械工程 本科</span>
+      <span class="tag" data-zh="📍 上海" data-en="📍 Shanghai">📍 上海</span>
     </div>
     <div class="actions">
-      <a class="btn btn-primary" href="#contact">联系我</a>
+      <a class="btn btn-primary" href="#contact" data-zh="联系我" data-en="Get in touch">联系我</a>
       <a class="btn btn-ghost" href="https://github.com/zzju524" target="_blank" rel="noopener">GitHub</a>
     </div>
   </div>
 
   <!-- ============ 关于 ============ -->
   <section id="about">
-    <h2>关于我</h2>
-    <p>我是赵子健，网名剑阁。目前就读于复旦大学经济学院，金融专业硕士在读；本科毕业于浙江大学机械工程专业。</p>
-    <p>从机械到金融，是一次跨度不小的转向。工科训练让我习惯把事情拆开、量化、找因果；金融则让我开始理解人、市场与不确定性。这两套思维方式正在我身上慢慢长到一起。</p>
-    <p>眼下最花时间的三件事：<strong>金融</strong>、<strong>健身</strong>、<strong>学习</strong>。</p>
+    <h2 data-zh="关于我" data-en="About">关于我</h2>
+    <p data-zh="我是赵子健。目前就读于复旦大学经济学院，金融专业硕士在读；本科毕业于浙江大学机械工程专业。"
+       data-en="I'm Jason Zhao (赵子健), a master's student in Finance at the School of Economics, Fudan University. I did my undergraduate degree in Mechanical Engineering at Zhejiang University.">我是赵子健。目前就读于复旦大学经济学院，金融专业硕士在读；本科毕业于浙江大学机械工程专业。</p>
+    <p data-zh="从机械到金融，是一次跨度不小的转向。工科训练让我习惯把事情拆开、量化、找因果；金融则让我开始理解人、市场与不确定性。这两套思维方式正在我身上慢慢长到一起。"
+       data-en="Moving from engineering into finance was a real leap. My engineering training taught me to break problems down, quantify them, and trace cause and effect; finance taught me to think about people, markets, and uncertainty. The two mindsets are gradually growing into one.">从机械到金融，是一次跨度不小的转向。工科训练让我习惯把事情拆开、量化、找因果；金融则让我开始理解人、市场与不确定性。这两套思维方式正在我身上慢慢长到一起。</p>
+    <p data-zh="眼下最花时间的三件事：<strong>金融</strong>、<strong>健身</strong>、<strong>学习</strong>。"
+       data-en="Three things take up most of my time these days: <strong>finance</strong>, <strong>fitness</strong>, and <strong>learning</strong>.">眼下最花时间的三件事：<strong>金融</strong>、<strong>健身</strong>、<strong>学习</strong>。</p>
   </section>
 
   <!-- ============ 教育 ============ -->
   <section id="education">
-    <h2>教育经历</h2>
+    <h2 data-zh="教育经历" data-en="Education">教育经历</h2>
     <div class="timeline">
       <div class="entry">
-        <h3>复旦大学 · 经济学院</h3>
-        <p class="meta">金融专业硕士 · 在读</p>
+        <h3 data-zh="复旦大学 · 经济学院" data-en="Fudan University (复旦大学) · School of Economics">复旦大学 · 经济学院</h3>
+        <p class="meta" data-zh="金融专业硕士 · 在读" data-en="M.Sc. in Finance · In progress">金融专业硕士 · 在读</p>
       </div>
       <div class="entry">
-        <h3>浙江大学</h3>
-        <p class="meta">机械工程 · 本科</p>
+        <h3 data-zh="浙江大学" data-en="Zhejiang University (浙江大学)">浙江大学</h3>
+        <p class="meta" data-zh="机械工程 · 本科" data-en="B.Eng. in Mechanical Engineering">机械工程 · 本科</p>
       </div>
     </div>
   </section>
 
   <!-- ============ 关注 ============ -->
   <section id="focus">
-    <h2>我在做什么</h2>
+    <h2 data-zh="我在做什么" data-en="What I'm Doing">我在做什么</h2>
     <div class="cards">
       <div class="card">
         <div class="icon">📈</div>
-        <h3>金融</h3>
-        <p>在学专业课，也在补数学与编程的底子。对市场怎么定价、风险怎么衡量这件事保持好奇。</p>
+        <h3 data-zh="金融" data-en="Finance">金融</h3>
+        <p data-zh="在学专业课，也在补数学与编程的底子。对市场怎么定价、风险怎么衡量这件事保持好奇。"
+           data-en="Working through core coursework and filling in the math and programming I'll need. Curious about how markets price assets and how risk is measured.">在学专业课，也在补数学与编程的底子。对市场怎么定价、风险怎么衡量这件事保持好奇。</p>
       </div>
       <div class="card">
         <div class="icon">🏋️</div>
-        <h3>健身</h3>
-        <p>日常的一部分。训练教会我一件和读书很像的事：长期坚持比短期爆发有用得多。</p>
+        <h3 data-zh="健身" data-en="Fitness">健身</h3>
+        <p data-zh="日常的一部分。训练教会我一件和读书很像的事：长期坚持比短期爆发有用得多。"
+           data-en="Part of my daily routine. Training taught me something that carries over to studying: showing up consistently beats short bursts.">日常的一部分。训练教会我一件和读书很像的事：长期坚持比短期爆发有用得多。</p>
       </div>
       <div class="card">
         <div class="icon">📚</div>
-        <h3>学习</h3>
-        <p>持续输入。读文献、读财报，也读点专业之外的书 —— 这个页面就是最近新学的一小块。</p>
+        <h3 data-zh="学习" data-en="Learning">学习</h3>
+        <p data-zh="持续输入。读文献、读财报，也读点专业之外的书 —— 这个页面就是最近新学的一小块。"
+           data-en="Always reading something — papers, financial statements, and books outside my field. This page is one small thing I picked up recently.">持续输入。读文献、读财报，也读点专业之外的书 —— 这个页面就是最近新学的一小块。</p>
       </div>
     </div>
   </section>
 
   <!-- ============ 联系 ============ -->
   <section id="contact">
-    <h2>联系我</h2>
+    <h2 data-zh="联系我" data-en="Contact">联系我</h2>
     <div class="contact">
-      <a href="mailto:1529980630@qq.com"><span class="k">邮箱</span> 1529980630@qq.com</a>
+      <a href="mailto:1529980630@qq.com"><span class="k" data-zh="邮箱" data-en="Email">邮箱</span> 1529980630@qq.com</a>
       <a href="https://github.com/zzju524" target="_blank" rel="noopener"><span class="k">GitHub</span> @zzju524</a>
+      <div class="row"><span class="k" data-zh="微信" data-en="WeChat">微信</span> Zzj241612_</div>
+      <div class="row"><span class="k" data-zh="抖音" data-en="Douyin">抖音</span> Zzj241612_</div>
     </div>
   </section>
 
 </main>
 
 <footer class="wrap">
-  © <span id="year"></span> 赵子健 · 用 HTML 和 CSS 手写
+  © <span id="year"></span> <span data-zh="赵子健 · 用 HTML 和 CSS 手写" data-en="Jason Zhao (赵子健) · Hand-coded in HTML and CSS">赵子健 · 用 HTML 和 CSS 手写</span>
 </footer>
 
 <script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'homepage-lang';
+  var TITLE = { zh: '赵子健 · 个人主页', en: 'Jason Zhao · Homepage' };
+  var DESC = {
+    zh: '赵子健（剑阁）的个人主页 —— 复旦大学金融专硕在读，关注金融、健身与学习。',
+    en: 'Personal homepage of Jason Zhao (赵子健) — M.Sc. in Finance at Fudan University. Focused on finance, fitness, and learning.'
+  };
+
+  // data-zh / data-en 是同一份内容的两套文案，切换时整体替换。
+  var nodes = document.querySelectorAll('[data-zh]');
+  var opts = document.querySelectorAll('[data-lang-opt]');
+  var metaDesc = document.querySelector('meta[name="description"]');
+
+  function setLang(lang) {
+    if (lang !== 'zh' && lang !== 'en') lang = 'en';
+
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    document.title = TITLE[lang];
+    if (metaDesc) metaDesc.setAttribute('content', DESC[lang]);
+
+    for (var i = 0; i < nodes.length; i++) {
+      var val = nodes[i].getAttribute('data-' + lang);
+      if (val !== null) nodes[i].innerHTML = val;
+    }
+    for (var j = 0; j < opts.length; j++) {
+      opts[j].classList.toggle('active', opts[j].getAttribute('data-lang-opt') === lang);
+    }
+
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) {}
+  }
+
+  // 默认英文；用户手动切过之后，用 localStorage 记住他的选择
+  var saved = 'en';
+  try { saved = localStorage.getItem(STORAGE_KEY) || 'en'; } catch (e) {}
+  setLang(saved);
+
+  document.getElementById('langBtn').addEventListener('click', function () {
+    setLang(document.documentElement.lang === 'zh-CN' ? 'en' : 'zh');
+  });
+
   document.getElementById('year').textContent = new Date().getFullYear();
+})();
 </script>
 </body>
 </html>
