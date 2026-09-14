@@ -84,12 +84,12 @@
   /* ---------- Hero ---------- */
   .hero { padding: 72px 0 56px; }
   .avatar {
-    width: 76px; height: 76px;
+    width: 84px; height: 84px;
     border-radius: 50%;
-    display: grid; place-items: center;
-    font-size: 30px; font-weight: 700; color: #fff;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    object-fit: cover;
+    display: block;
     margin-bottom: 22px;
+    border: 2px solid var(--line);
   }
   .hero h1 {
     margin: 0 0 10px;
@@ -213,7 +213,7 @@
 
   <!-- ============ Hero ============ -->
   <div class="hero">
-    <div class="avatar">赵</div>
+    <img class="avatar" src="avatar.jpg" alt="赵子健" width="84" height="84">
     <h1>赵子健<span class="alias">剑阁</span></h1>
     <p class="role">复旦大学经济学院 · 金融专硕在读</p>
     <div class="tags">
