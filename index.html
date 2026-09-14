@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Jason Zhao · Homepage</title>
 <meta name="description" content="Personal homepage of Jason Zhao (赵子健) — M.Sc. in Finance at Fudan University. Focused on finance, fitness, and learning.">
+<link rel="canonical" href="https://zijian-zhao.vercel.app/">
+
+<!-- 手机浏览器地址栏的配色，跟着系统明暗走 -->
+<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
 
 <!-- 图标 -->
 <link rel="icon" type="image/png" href="favicon.png">
@@ -13,13 +18,20 @@
 <!-- 分享卡片：微信 / Twitter / LinkedIn 抓的是这几个标签，爬虫不跑 JS，所以只写英文默认文案 -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://zijian-zhao.vercel.app/">
+<meta property="og:site_name" content="Jason Zhao">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="zh_CN">
 <meta property="og:title" content="Jason Zhao · Homepage">
 <meta property="og:description" content="M.Sc. in Finance at Fudan University. Focused on finance, fitness, and learning.">
-<meta property="og:image" content="https://zijian-zhao.vercel.app/avatar.jpg">
-<meta name="twitter:card" content="summary">
+<!-- og:image 要用 1200x630 横图；方图在微信 / Twitter 上会缩成一个小方块 -->
+<meta property="og:image" content="https://zijian-zhao.vercel.app/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Jason Zhao (赵子健)">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Jason Zhao · Homepage">
 <meta name="twitter:description" content="M.Sc. in Finance at Fudan University. Focused on finance, fitness, and learning.">
-<meta name="twitter:image" content="https://zijian-zhao.vercel.app/avatar.jpg">
+<meta name="twitter:image" content="https://zijian-zhao.vercel.app/og-cover.jpg">
 
 <style>
   /* ---------- 配色 ----------
@@ -35,6 +47,8 @@
     --muted: #5f6673;
     --accent: #2f6feb;
     --accent-2: #6b52e0;
+    /* 主按钮上的文字色。深色模式必须换成深色 —— 浅蓝底配白字对比度只有 2.4:1，达不到 AA */
+    --on-accent: #ffffff;
     --radius: 14px;
   }
   :root[data-theme="dark"] {
@@ -47,6 +61,7 @@
     --muted: #9aa3b2;
     --accent: #6ea8fe;
     --accent-2: #8b7cf6;
+    --on-accent: #10131a;
   }
 
   * { box-sizing: border-box; }
@@ -63,21 +78,32 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+  /* max() 里的 safe-area 是给 iPhone 刘海用的，配合上面的 viewport-fit=cover */
+  .wrap {
+    max-width: 760px; margin: 0 auto;
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
+  }
 
   /* ---------- 顶部导航 ---------- */
   header {
     position: sticky;
     top: 0;
     z-index: 10;
+    /* 第一行是回退：老浏览器不认 color-mix，没有它顶栏背景会整条消失 */
+    background: var(--bg);
     background: color-mix(in srgb, var(--bg) 82%, transparent);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--line);
   }
   nav {
     max-width: 760px;
     margin: 0 auto;
-    padding: 14px 24px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -99,7 +125,21 @@
     transition: color .18s ease;
   }
   nav a:hover { color: var(--text); }
-  @media (max-width: 600px) { nav ul { display: none; } }
+  /* 手机上不再把导航整个藏掉，而是折到第二行；万一还放不下也能横向滑 */
+  @media (max-width: 600px) {
+    nav { flex-wrap: wrap; row-gap: 2px; }
+    nav ul {
+      order: 3;
+      flex-basis: 100%;
+      gap: 18px;
+      margin: 0;
+      padding: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav ul::-webkit-scrollbar { display: none; }
+    .hero { padding: 48px 0 40px; }
+  }
 
   /* ---------- 顶栏小按钮（语言 / 主题 共用） ---------- */
   .pill {
@@ -168,7 +208,7 @@
     transition: transform .15s ease, opacity .15s ease;
   }
   .btn:hover { transform: translateY(-1px); opacity: .9; }
-  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--on-accent); }
   .btn-ghost { border: 1px solid var(--line); color: var(--text); background: var(--bg-soft); }
 
   /* ---------- 区块 ---------- */
@@ -209,6 +249,7 @@
   }
   .entry h3 { margin: 0 0 2px; font-size: 16px; }
   .entry .meta { color: var(--muted); font-size: 14px; margin: 0; }
+  .entry .courses { color: var(--muted); font-size: 13.5px; margin: 7px 0 0; line-height: 1.6; }
 
   /* ---------- 关注方向 ---------- */
   .cards { display: grid; gap: 14px; }
@@ -254,6 +295,16 @@
     font-size: 13px;
     text-align: center;
   }
+
+  /* ---------- 无障碍：尊重系统的「减弱动态效果」 ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
 </style>
 
 <script>
@@ -284,10 +335,10 @@
         <li><a href="#focus" data-zh="关注" data-en="Focus">Focus</a></li>
         <li><a href="#contact" data-zh="联系" data-en="Contact">Contact</a></li>
       </ul>
-      <button class="pill" id="themeBtn" type="button" aria-label="切换明暗 / Toggle theme">
+      <button class="pill" id="themeBtn" type="button" aria-label="切换明暗 / Toggle theme" aria-pressed="false">
         <span data-theme-opt="light">☀️</span><span class="sep">/</span><span data-theme-opt="dark">🌙</span>
       </button>
-      <button class="pill" id="langBtn" type="button" aria-label="切换语言 / Switch language">
+      <button class="pill" id="langBtn" type="button" aria-label="切换语言 / Switch language" aria-pressed="false">
         <span data-lang-opt="zh">中</span><span class="sep">/</span><span data-lang-opt="en">EN</span>
       </button>
     </div>
@@ -298,7 +349,8 @@
 
   <!-- ============ Hero ============ -->
   <div class="hero">
-    <img class="avatar" src="avatar.jpg" alt="赵子健 Jason Zhao" width="84" height="84">
+    <!-- 只显示 84px，所以用 168px 的 2 倍图就够了；400px 的原图留给 og:image -->
+    <img class="avatar" src="avatar-168.jpg" alt="赵子健 Jason Zhao" width="84" height="84">
     <h1><span data-zh="赵子健" data-en="Jason Zhao">Jason Zhao</span><span class="alias" data-zh="剑阁" data-en="Zzju">Zzju</span></h1>
     <p class="role"
        data-zh="复旦大学经济学院 · 金融专硕在读"
@@ -334,10 +386,12 @@
       <div class="entry">
         <h3 data-zh="复旦大学 · 经济学院" data-en="Fudan University (复旦大学) · School of Economics">Fudan University (复旦大学) · School of Economics</h3>
         <p class="meta" data-zh="金融专业硕士 · 在读" data-en="M.Sc. in Finance · In progress">M.Sc. in Finance · In progress</p>
+        <p class="courses" data-zh="相关课程：货币经济学、投资学、公司金融、国际金融学、金融风险管理、金融市场学" data-en="Coursework: Monetary Economics, Investments, Corporate Finance, International Finance, Financial Risk Management, Financial Markets">Coursework: Monetary Economics, Investments, Corporate Finance, International Finance, Financial Risk Management, Financial Markets</p>
       </div>
       <div class="entry">
         <h3 data-zh="浙江大学" data-en="Zhejiang University (浙江大学)">Zhejiang University (浙江大学)</h3>
-        <p class="meta" data-zh="机械工程 · 本科" data-en="B.Eng. in Mechanical Engineering">B.Eng. in Mechanical Engineering</p>
+        <p class="meta" data-zh="机械工程 · 工学学士" data-en="B.Eng. in Mechanical Engineering">B.Eng. in Mechanical Engineering</p>
+        <p class="courses" data-zh="主修课程：机械设计、机械制图及 CAD 基础、理论力学、电工电子学、控制工程基础、互换性与技术测量" data-en="Core coursework: Mechanical Design, Mechanical Drawing and CAD, Theoretical Mechanics, Electrical and Electronic Engineering, Fundamentals of Control Engineering, Interchangeability and Technical Measurement">Core coursework: Mechanical Design, Mechanical Drawing and CAD, Theoretical Mechanics, Electrical and Electronic Engineering, Fundamentals of Control Engineering, Interchangeability and Technical Measurement</p>
       </div>
     </div>
   </section>
@@ -374,7 +428,8 @@
        data-zh="我足够丰富，无法被一张页面定义"
        data-en="There's more to me than one page can hold.">There's more to me than one page can hold.</p>
     <div class="contact">
-      <a href="mailto:1529980630@qq.com"><span class="k" data-zh="邮箱" data-en="Email">Email</span> 1529980630@qq.com</a>
+      <!-- 邮箱不在 HTML 里出现明文（爬虫抓不到），由页面底部脚本拼出来 -->
+      <a id="mailLink" href="#"><span class="k" data-zh="邮箱" data-en="Email">Email</span> <span id="mailText">—</span></a>
       <a href="https://github.com/zzju524" target="_blank" rel="noopener"><span class="k">GitHub</span> @zzju524</a>
       <div class="row"><span class="k" data-zh="微信" data-en="WeChat">WeChat</span> Zzj241612_</div>
     </div>
@@ -385,6 +440,25 @@
 <footer class="wrap">
   © <span id="year"></span> <span data-zh="赵子健 · 用 HTML 和 CSS 手写" data-en="Jason Zhao (赵子健) · Hand-coded in HTML and CSS">Jason Zhao (赵子健) · Hand-coded in HTML and CSS</span>
 </footer>
+
+<!-- 结构化数据：让搜索引擎认出「这个人是谁」，Google 结果里能出富摘要 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "赵子健",
+  "alternateName": ["Jason Zhao", "剑阁", "Zzju"],
+  "url": "https://zijian-zhao.vercel.app/",
+  "image": "https://zijian-zhao.vercel.app/avatar.jpg",
+  "description": "M.Sc. in Finance at Fudan University. Focused on finance, fitness, and learning.",
+  "affiliation": { "@type": "CollegeOrUniversity", "name": "复旦大学" },
+  "alumniOf": { "@type": "CollegeOrUniversity", "name": "浙江大学" },
+  "sameAs": [
+    "https://github.com/zzju524",
+    "https://www.douyin.com/user/MS4wLjABAAAAh4eMCFxw4Cfa7Rrtt-MiKl9Wt43HpZ4MRn6hA1C1b3A"
+  ]
+}
+</script>
 
 <script>
 (function () {
@@ -403,6 +477,8 @@
   var themeOpts = document.querySelectorAll('[data-theme-opt]');
   var metaDesc = document.querySelector('meta[name="description"]');
   var root = document.documentElement;
+  var langBtn = document.getElementById('langBtn');
+  var themeBtn = document.getElementById('themeBtn');
 
   /* ---------------- 语言 ---------------- */
 
@@ -422,6 +498,8 @@
     for (var j = 0; j < langOpts.length; j++) {
       langOpts[j].classList.toggle('active', langOpts[j].getAttribute('data-lang-opt') === lang);
     }
+    // 无障碍：pressed = 当前是中文
+    langBtn.setAttribute('aria-pressed', lang === 'zh' ? 'true' : 'false');
 
     try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
   }
@@ -442,6 +520,8 @@
     for (var i = 0; i < themeOpts.length; i++) {
       themeOpts[i].classList.toggle('active', themeOpts[i].getAttribute('data-theme-opt') === theme);
     }
+    // 无障碍：pressed = 当前是深色
+    themeBtn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
     if (remember) {
       try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
     }
@@ -462,11 +542,11 @@
 
   applyTheme(currentTheme(), false);
 
-  document.getElementById('langBtn').addEventListener('click', function () {
+  langBtn.addEventListener('click', function () {
     setLang(root.lang === 'zh-CN' ? 'en' : 'zh');
   });
 
-  document.getElementById('themeBtn').addEventListener('click', function () {
+  themeBtn.addEventListener('click', function () {
     applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
   });
 
@@ -479,6 +559,17 @@
     if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
     else if (mq.addListener) mq.addListener(onSystemChange);
   }
+
+  /* ---------------- 邮箱（防爬） ---------------- */
+
+  // 倒着存一份，HTML 源码里既没有 mailto: 也搜不到完整邮箱，正则爬虫抓不走
+  (function () {
+    var mailbox = 'moc.qq@0360899251'.split('').reverse().join('');
+    var text = document.getElementById('mailText');
+    if (!text) return;
+    text.textContent = mailbox;
+    document.getElementById('mailLink').setAttribute('href', 'mailto:' + mailbox);
+  })();
 
   document.getElementById('year').textContent = new Date().getFullYear();
 })();
