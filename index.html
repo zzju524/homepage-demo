@@ -484,6 +484,53 @@
     }
     .reveal { opacity: 1; transform: none; }
   }
+
+  /* ---------- 主题切换过渡 ----------
+     换主题时从按钮位置扩散一圈新配色。浏览器不支持 View Transitions 时，
+     这段 CSS 会全部落空，切换行为和以前一模一样 —— 所以不用做特性检测的降级 */
+  @keyframes theme-spread {
+    from { clip-path: circle(0 at var(--t-x, 50%) var(--t-y, 0)); }
+    to   { clip-path: circle(var(--t-r, 150vmax) at var(--t-x, 50%) var(--t-y, 0)); }
+  }
+  /* 先关掉默认的交叉淡入，否则它和扩散叠在一起会糊成一片 */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+  ::view-transition-new(root) {
+    animation: theme-spread .5s cubic-bezier(.4, 0, .2, 1);
+  }
+
+  /* ---------- 打印 ---------- */
+  /* 顶栏、回到顶部按钮、顶部光晕都是屏幕上的东西，纸上没有意义 */
+  @media print {
+    /* 深色模式也强制走浅色 —— 整页黑底会吃掉一整盒墨 */
+    :root, :root[data-theme="dark"] {
+      --bg: #fff; --bg-soft: #fff; --card: #fff;
+      --line: #d5d8dd; --text: #000; --muted: #444;
+      --accent: #000; --accent-2: #000; --on-accent: #fff;
+    }
+    body { background: #fff; }
+    body::before, header, .to-top { display: none !important; }
+
+    /* ⚠️ 必须显式放开：section 淡入是从 opacity:0 起步的，还没滚动到的部分
+       没被 observer 标记过 .is-in，不放开就会整段印成空白。
+       hero 的动画同理 —— backwards 填充会让它在延迟期间停在 opacity:0 */
+    .reveal { opacity: 1; transform: none; }
+    .hero > * { animation: none; opacity: 1; transform: none; }
+
+    /* 卡片和条目别被拦腰截到两页上 */
+    .card, .entry, .contact a, .contact .row { break-inside: avoid; }
+    h2 { break-after: avoid; }
+
+    /* 纸上的圆点不再需要那圈背景色描边去断线，但直接去掉会让竖线穿过圆点，
+       所以改成白色而不是 none */
+    .entry::before { box-shadow: 0 0 0 4px #fff; }
+    .avatar, .btn { box-shadow: none; }
+    .card { transition: none; }
+    footer { border-top-color: #d5d8dd; }
+  }
 </style>
 
 <script>
@@ -737,6 +784,36 @@
     return (t === 'light' || t === 'dark') ? t : null;
   }
 
+  // 从按钮位置扩散一圈。浏览器不支持 View Transitions、或者用户开了「减弱动态
+  // 效果」时，直接换，行为和以前完全一样
+  function switchTheme(next, fromEl) {
+    if (!document.startViewTransition || reduceMotion) {
+      applyTheme(next, true);
+      return;
+    }
+
+    // 半径要够到离按钮最远的那个角，否则圈还没盖满整屏就停了
+    var r = fromEl.getBoundingClientRect();
+    var x = r.left + r.width / 2;
+    var y = r.top + r.height / 2;
+    var dx = Math.max(x, window.innerWidth - x);
+    var dy = Math.max(y, window.innerHeight - y);
+    root.style.setProperty('--t-x', x + 'px');
+    root.style.setProperty('--t-y', y + 'px');
+    root.style.setProperty('--t-r', Math.sqrt(dx * dx + dy * dy) + 'px');
+
+    function clearVars() {
+      root.style.removeProperty('--t-x');
+      root.style.removeProperty('--t-y');
+      root.style.removeProperty('--t-r');
+    }
+
+    // 变量挂在 <html> 上，过渡跑完要清掉，免得被别处当普通自定义属性继承
+    document.startViewTransition(function () {
+      applyTheme(next, true);
+    }).finished.then(clearVars, clearVars);
+  }
+
   /* ---------------- 初始化 ---------------- */
 
   // 默认英文；用户手动切过之后，用 localStorage 记住他的选择
@@ -751,7 +828,7 @@
   });
 
   themeBtn.addEventListener('click', function () {
-    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
+    switchTheme(currentTheme() === 'dark' ? 'light' : 'dark', themeBtn);
   });
 
   // 用户没手动选过主题时，跟着系统设置实时变
