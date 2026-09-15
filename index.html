@@ -50,6 +50,8 @@
     /* 主按钮上的文字色。深色模式必须换成深色 —— 浅蓝底配白字对比度只有 2.4:1，达不到 AA */
     --on-accent: #ffffff;
     --radius: 14px;
+    /* 顶栏高度。锚点跳转要靠它留白；手机上导航折成两行，会更高 */
+    --nav-h: 72px;
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
@@ -66,7 +68,11 @@
 
   * { box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    /* 点锚点跳过去时，把标题从 sticky 顶栏底下让出来 */
+    scroll-padding-top: var(--nav-h);
+  }
 
   body {
     margin: 0;
@@ -76,6 +82,25 @@
                  "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
+    /* 兜底：万一以后哪个装饰元素又超出去，也不至于让整页能左右拖。
+       用 clip 而不是 hidden —— hidden 会建立滚动容器，把 sticky 顶栏搞坏 */
+    overflow-x: clip;
+    position: relative;
+  }
+
+  /* 页面顶部一层很淡的光晕。
+     ⚠️ 必须挂在 body 上，不能挂在 .hero 上：.hero 只有 760px 宽，渐变还没淡到
+     透明就被盒子截断，会在左右留下两道直边。body 是整屏宽，左右没有内边缘。 */
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 420px;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(58% 100% at 50% 0%,
+                color-mix(in srgb, var(--accent) 13%, transparent),
+                transparent 72%);
   }
 
   /* max() 里的 safe-area 是给 iPhone 刘海用的，配合上面的 viewport-fit=cover */
@@ -117,27 +142,39 @@
     color: transparent;
   }
   .nav-right { display: flex; align-items: center; gap: 8px; }
-  nav ul { display: flex; gap: 20px; list-style: none; margin: 0 8px 0 0; padding: 0; }
+  nav ul { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; }
   nav a {
+    position: relative;
     color: var(--muted);
     text-decoration: none;
     font-size: 14px;
     transition: color .18s ease;
   }
   nav a:hover { color: var(--text); }
-  /* 手机上不再把导航整个藏掉，而是折到第二行；万一还放不下也能横向滑 */
+  /* 当前所在的板块，由页面底部脚本切 .active */
+  nav a.active { color: var(--text); }
+  nav a.active::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -5px;
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  }
+  /* 手机上不再把导航整个藏掉，而是折到第二行；万一还放不下也能横向滑。
+     ul 是 nav 的直接子元素，flex-basis:100% 才真的能把它顶到下一行 */
   @media (max-width: 600px) {
+    :root { --nav-h: 96px; }
     nav { flex-wrap: wrap; row-gap: 2px; }
     nav ul {
       order: 3;
       flex-basis: 100%;
       gap: 18px;
-      margin: 0;
-      padding: 0;
       overflow-x: auto;
       scrollbar-width: none;
     }
     nav ul::-webkit-scrollbar { display: none; }
+    nav a.active::after { bottom: -3px; }
     .hero { padding: 48px 0 40px; }
   }
 
@@ -171,13 +208,28 @@
 
   /* ---------- Hero ---------- */
   .hero { padding: 72px 0 56px; }
+  /* 首屏依次浮起。用 CSS 动画而不是 JS，避免脚本跑之前先画一帧再隐藏的闪烁 */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+  }
+  /* 用 backwards 而不是 both：延迟期间保持 from 状态就够了。both 会让动画结束后
+     仍由关键帧接管 opacity/transform，万一动画没跑起来内容就永远看不见 */
+  .hero > * { animation: rise .55s cubic-bezier(.22, .61, .36, 1) backwards; }
+  .hero > *:nth-child(2) { animation-delay: 60ms; }
+  .hero > *:nth-child(3) { animation-delay: 120ms; }
+  .hero > *:nth-child(4) { animation-delay: 180ms; }
+  .hero > *:nth-child(5) { animation-delay: 240ms; }
+  .hero > *:nth-child(n+6) { animation-delay: 300ms; }
+  /* 3px 内边距 + 渐变底 = 一圈渐变描边，比单色 border 精神一些 */
   .avatar {
     width: 84px; height: 84px;
+    padding: 3px;
     border-radius: 50%;
     object-fit: cover;
     display: block;
     margin-bottom: 22px;
-    border: 2px solid var(--line);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
   }
   .hero h1 {
     margin: 0 0 10px;
@@ -212,20 +264,30 @@
   .btn-ghost { border: 1px solid var(--line); color: var(--text); background: var(--bg-soft); }
 
   /* ---------- 区块 ---------- */
-  /* scroll-margin-top：顶部导航是 sticky 的，不留出这段距离的话
-     点锚点跳过来，标题会被导航条压住 */
+  /* 锚点留白统一由 html 的 scroll-padding-top 负责，这里不用再写 scroll-margin */
   section {
     padding: 40px 0;
     border-top: 1px solid var(--line);
-    scroll-margin-top: 72px;
   }
   section h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 20px;
     text-transform: uppercase;
     letter-spacing: .04em;
     color: var(--text);
     margin: 0 0 20px;
     font-weight: 700;
+  }
+  /* 标题前的小竖条，给每个板块一个视觉锚点 */
+  section h2::before {
+    content: "";
+    flex: none;
+    width: 4px;
+    height: 17px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-2));
   }
   section p { margin: 0 0 14px; }
   section p:last-child { margin-bottom: 0; }
@@ -259,9 +321,14 @@
     border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 20px;
-    transition: border-color .18s ease, transform .18s ease;
+    transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
   }
-  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    /* 用 accent 混出来的柔光；color-mix 不认时只是没有阴影 */
+    box-shadow: 0 10px 26px -14px color-mix(in srgb, var(--accent) 60%, transparent);
+  }
   .card .icon { font-size: 22px; line-height: 1; margin-bottom: 10px; }
   .card h3 { margin: 0 0 6px; font-size: 16px; }
   .card p { color: var(--muted); font-size: 14px; margin: 0; }
@@ -296,7 +363,52 @@
     text-align: center;
   }
 
-  /* ---------- 无障碍：尊重系统的「减弱动态效果」 ---------- */
+  /* ---------- 滚动淡入 ---------- */
+  /* .reveal 由脚本添加，所以脚本没跑起来时内容本来就是可见的，不会白屏。
+     只给首屏以下的 section 用 —— hero 走上面的 CSS 动画，那边没有首帧闪烁的风险 */
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  .reveal.is-in { opacity: 1; transform: none; }
+
+  /* ---------- 回到顶部 ---------- */
+  .to-top {
+    position: fixed;
+    right: max(20px, env(safe-area-inset-right));
+    bottom: max(20px, env(safe-area-inset-bottom));
+    width: 42px; height: 42px;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    font: inherit;
+    font-size: 17px;
+    line-height: 1;
+    color: var(--text);
+    background: var(--bg-soft);
+    background: color-mix(in srgb, var(--bg-soft) 86%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    cursor: pointer;
+    /* 默认藏起来：脚本没跑时它是不可见也不可点的，不会挡路 */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity .2s ease, transform .2s ease, visibility .2s, border-color .18s ease;
+  }
+  .to-top.show { opacity: 1; visibility: visible; transform: none; }
+  .to-top:hover { border-color: var(--accent); }
+
+  /* ---------- 无障碍 ---------- */
+  /* 键盘 Tab 才显示焦点圈，鼠标点击不显示；颜色统一成品牌色 */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  /* 尊重系统的「减弱动态效果」 */
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after {
@@ -304,6 +416,7 @@
       animation-iteration-count: 1 !important;
       transition-duration: .01ms !important;
     }
+    .reveal { opacity: 1; transform: none; }
   }
 </style>
 
@@ -328,13 +441,14 @@
 <header>
   <nav>
     <div class="brand"><span data-zh="赵子健" data-en="Jason Zhao">Jason Zhao</span></div>
+    <!-- ul 必须是 nav 的直接子元素，小屏下 flex-basis:100% 才能把它顶到第二行 -->
+    <ul>
+      <li><a href="#about" data-zh="关于" data-en="About">About</a></li>
+      <li><a href="#education" data-zh="教育" data-en="Education">Education</a></li>
+      <li><a href="#focus" data-zh="关注" data-en="Focus">Focus</a></li>
+      <li><a href="#contact" data-zh="联系" data-en="Contact">Contact</a></li>
+    </ul>
     <div class="nav-right">
-      <ul>
-        <li><a href="#about" data-zh="关于" data-en="About">About</a></li>
-        <li><a href="#education" data-zh="教育" data-en="Education">Education</a></li>
-        <li><a href="#focus" data-zh="关注" data-en="Focus">Focus</a></li>
-        <li><a href="#contact" data-zh="联系" data-en="Contact">Contact</a></li>
-      </ul>
       <button class="pill" id="themeBtn" type="button" aria-label="切换明暗 / Toggle theme" aria-pressed="false">
         <span data-theme-opt="light">☀️</span><span class="sep">/</span><span data-theme-opt="dark">🌙</span>
       </button>
@@ -441,6 +555,10 @@
   © <span id="year"></span> <span data-zh="赵子健 · 用 HTML 和 CSS 手写" data-en="Jason Zhao (赵子健) · Hand-coded in HTML and CSS">Jason Zhao (赵子健) · Hand-coded in HTML and CSS</span>
 </footer>
 
+<!-- 回到顶部。默认 opacity:0，由脚本在滚动一段后显示；
+     JS 没跑起来时它一直是隐藏的，不会变成一个按了没反应的按钮 -->
+<button class="to-top" id="toTop" type="button" aria-label="回到顶部 / Back to top">↑</button>
+
 <!-- 结构化数据：让搜索引擎认出「这个人是谁」，Google 结果里能出富摘要 -->
 <script type="application/ld+json">
 {
@@ -504,6 +622,25 @@
     try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
   }
 
+  /* ---------------- 地址栏配色 ---------------- */
+
+  // <head> 里那两条带 media 的 meta 是「没有 JS 时跟系统走」的兜底。
+  // JS 一旦跑起来就把它们换成一条不带 media 的 —— 否则用户手动切了主题、
+  // 系统偏好却没变时，手机地址栏的颜色会和页面不一致。
+  var THEME_COLOR = { light: '#f7f8fa', dark: '#0f1115' };
+  var themeColorMeta = null;
+
+  function syncThemeColor(theme) {
+    if (!themeColorMeta) {
+      var olds = document.querySelectorAll('meta[name="theme-color"]');
+      for (var i = 0; i < olds.length; i++) olds[i].parentNode.removeChild(olds[i]);
+      themeColorMeta = document.createElement('meta');
+      themeColorMeta.setAttribute('name', 'theme-color');
+      document.head.appendChild(themeColorMeta);
+    }
+    themeColorMeta.setAttribute('content', THEME_COLOR[theme] || THEME_COLOR.light);
+  }
+
   /* ---------------- 明暗主题 ---------------- */
 
   // data-theme 属性已经在 <head> 里设好了，这里只负责同步按钮状态和后续切换。
@@ -516,6 +653,7 @@
     if (theme !== 'light' && theme !== 'dark') theme = 'light';
 
     root.setAttribute('data-theme', theme);
+    syncThemeColor(theme);
 
     for (var i = 0; i < themeOpts.length; i++) {
       themeOpts[i].classList.toggle('active', themeOpts[i].getAttribute('data-theme-opt') === theme);
@@ -558,6 +696,109 @@
     };
     if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
     else if (mq.addListener) mq.addListener(onSystemChange);
+  }
+
+  /* ---------------- 滚动相关（高亮 / 回到顶部 / 淡入） ---------------- */
+
+  var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var header = document.querySelector('header');
+  var toTop = document.getElementById('toTop');
+
+  /* -- 高亮当前板块 -- */
+
+  // 把导航里指向页内锚点的链接和对应区块配成对
+  var spy = [];
+  var navLinks = document.querySelectorAll('nav ul a');
+  for (var n = 0; n < navLinks.length; n++) {
+    var href = navLinks[n].getAttribute('href') || '';
+    var target = href.charAt(0) === '#' ? document.getElementById(href.slice(1)) : null;
+    if (target) spy.push({ link: navLinks[n], el: target });
+  }
+
+  var lastActive = -2;
+
+  function updateSpy() {
+    if (!spy.length) return;
+
+    // 顶栏是 sticky 的，被它盖住的那一段算「还没到」，判定位要往下挪一点
+    var line = (header ? header.offsetHeight : 0) + 24;
+    var active = -1;   // -1 = 还在 hero，没有任何一个板块算「当前」
+
+    for (var i = 0; i < spy.length; i++) {
+      if (spy[i].el.getBoundingClientRect().top <= line) active = i;
+    }
+    // 滚到底时最后一段可能够不到判定位，直接兜底
+    if (window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 4) {
+      active = spy.length - 1;
+    }
+    if (active === lastActive) return;
+    lastActive = active;
+
+    for (var j = 0; j < spy.length; j++) {
+      var on = j === active;
+      spy[j].link.classList.toggle('active', on);
+      // 无障碍：告诉读屏软件「你现在在这块」
+      if (on) spy[j].link.setAttribute('aria-current', 'location');
+      else spy[j].link.removeAttribute('aria-current');
+    }
+  }
+
+  function updateToTop() {
+    if (!toTop) return;
+    toTop.classList.toggle('show', window.pageYOffset > 400);
+  }
+
+  // 滚动事件很密集，用 rAF 收一下，一帧最多算一次
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      ticking = false;
+      updateSpy();
+      updateToTop();
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  updateSpy();
+  updateToTop();
+
+  if (toTop) {
+    toTop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+  }
+
+  /* -- 进入视口时淡入 -- */
+
+  // 只处理首屏以下的 section：hero 交给 CSS 动画了，那边没有首帧闪烁的问题。
+  // .reveal 是脚本加的，脚本没跑或浏览器太老时内容本来就可见，不会白屏。
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    var ioFired = false;
+
+    var io = new IntersectionObserver(function (entries) {
+      ioFired = true;
+      for (var e = 0; e < entries.length; e++) {
+        if (!entries[e].isIntersecting) continue;
+        entries[e].target.classList.add('is-in');
+        io.unobserve(entries[e].target);   // 只淡入一次，来回滚不再折腾
+      }
+    });
+
+    var sections = document.querySelectorAll('section');
+    for (var s = 0; s < sections.length; s++) {
+      sections[s].classList.add('reveal');
+      io.observe(sections[s]);
+    }
+
+    // 兜底：万一把 .reveal 加上去了、observer 却始终没回调，这些 section 就
+    // 永远停在 opacity:0 —— 内容直接消失。宁可丢掉动画也不能丢内容。
+    // 只要 observer 正常回调过一次，这里就什么都不做。
+    setTimeout(function () {
+      if (ioFired) return;
+      for (var k = 0; k < sections.length; k++) sections[k].classList.add('is-in');
+    }, 1200);
   }
 
   /* ---------------- 邮箱（防爬） ---------------- */
