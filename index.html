@@ -88,6 +88,16 @@
     position: relative;
   }
 
+  /* ---------- 排版细节 ---------- */
+  /* 标题避免最后一行只剩一个词；正文避免出现孤字（不认识这两个属性的浏览器直接忽略） */
+  h1, h2, h3 { text-wrap: balance; }
+  p { text-wrap: pretty; }
+  /* 选中文字用品牌色，而不是系统默认的蓝 */
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
   /* 页面顶部一层很淡的光晕。
      ⚠️ 必须挂在 body 上，不能挂在 .hero 上：.hero 只有 760px 宽，渐变还没淡到
      透明就被盒子截断，会在左右留下两道直边。body 是整屏宽，左右没有内边缘。 */
@@ -230,6 +240,7 @@
     display: block;
     margin-bottom: 22px;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 8px 20px -11px color-mix(in srgb, var(--accent) 75%, transparent);
   }
   .hero h1 {
     margin: 0 0 10px;
@@ -257,11 +268,33 @@
     font-size: 15px;
     font-weight: 500;
     text-decoration: none;
-    transition: transform .15s ease, opacity .15s ease;
+    /* 手机上点按有个系统蓝框，和这里的 hover/active 反馈打架，关掉 */
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .15s ease, box-shadow .2s ease, border-color .18s ease;
   }
-  .btn:hover { transform: translateY(-1px); opacity: .9; }
-  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--on-accent); }
+  /* 用阴影而不是降透明度来表达 hover —— 半透明会把渐变底色洗淡 */
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: translateY(0) scale(.985); }
+  .btn svg { display: block; flex: none; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: var(--on-accent);
+    box-shadow: 0 6px 16px -9px color-mix(in srgb, var(--accent) 80%, transparent);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 11px 24px -9px color-mix(in srgb, var(--accent) 90%, transparent);
+  }
+  /* CTA 的箭头用 CSS 生成，不能写进 HTML —— 切语言时脚本会整体替换
+     innerHTML，写在标签里的图标会被一起抹掉 */
+  .btn-primary::after {
+    content: "→";
+    font-size: 1.05em;
+    line-height: 1;
+    transition: transform .18s ease;
+  }
+  .btn-primary:hover::after { transform: translateX(3px); }
   .btn-ghost { border: 1px solid var(--line); color: var(--text); background: var(--bg-soft); }
+  .btn-ghost:hover { border-color: var(--accent); }
 
   /* ---------- 区块 ---------- */
   /* 锚点留白统一由 html 的 scroll-padding-top 负责，这里不用再写 scroll-margin */
@@ -306,7 +339,8 @@
     left: -7px; top: 8px;
     width: 12px; height: 12px;
     border-radius: 50%;
-    background: var(--accent);
+    /* 渐变点 + 一圈背景色描边，把竖线在点的位置断开 */
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
     box-shadow: 0 0 0 4px var(--bg);
   }
   .entry h3 { margin: 0 0 2px; font-size: 16px; }
@@ -329,7 +363,21 @@
     /* 用 accent 混出来的柔光；color-mix 不认时只是没有阴影 */
     box-shadow: 0 10px 26px -14px color-mix(in srgb, var(--accent) 60%, transparent);
   }
-  .card .icon { font-size: 22px; line-height: 1; margin-bottom: 10px; }
+  /* emoji 塞进一个浅色圆角方块。裸 emoji 的字号和基线在不同系统差很多，
+     直接摆在那里会显得很随意 */
+  .card .icon {
+    width: 38px; height: 38px;
+    display: grid;
+    place-items: center;
+    font-size: 19px;
+    line-height: 1;
+    border-radius: 11px;
+    margin-bottom: 14px;
+    background: var(--bg-soft);
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+    border: 1px solid var(--line);
+    border-color: color-mix(in srgb, var(--accent) 20%, transparent);
+  }
   .card h3 { margin: 0 0 6px; font-size: 16px; }
   .card p { color: var(--muted); font-size: 14px; margin: 0; }
 
@@ -345,10 +393,28 @@
     border-radius: 10px;
     background: var(--card);
     font-size: 15px;
+    -webkit-tap-highlight-color: transparent;
     transition: border-color .18s ease;
   }
   .contact a:hover { border-color: var(--accent); }
-  .contact .k { color: var(--muted); font-size: 13px; min-width: 62px; }
+  /* 只有可点的那几行右侧才浮出箭头，和不可点的微信行区分开 */
+  .contact a::after {
+    content: "→";
+    margin-left: auto;
+    color: var(--accent);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .contact a:hover::after { opacity: 1; transform: none; }
+  /* 做成小号大写的栏目标签，和 section h2 的调子保持一致 */
+  .contact .k {
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    min-width: 62px;
+  }
   .contact-note {
     margin: 0 0 22px;
     font-size: 13.5px;
@@ -476,7 +542,7 @@
     </div>
     <div class="actions">
       <a class="btn btn-primary" href="#contact" data-zh="联系我" data-en="Get in touch">Get in touch</a>
-      <a class="btn btn-ghost" href="https://github.com/zzju524" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-ghost" href="https://github.com/zzju524" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
       <a class="btn btn-ghost" href="https://www.douyin.com/user/MS4wLjABAAAAh4eMCFxw4Cfa7Rrtt-MiKl9Wt43HpZ4MRn6hA1C1b3A"
          target="_blank" rel="noopener" data-zh="社交媒体" data-en="Social Media">Social Media</a>
     </div>
